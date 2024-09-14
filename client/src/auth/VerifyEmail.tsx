@@ -33,7 +33,7 @@ const VerifyEmail = () => {
     <div className="flex items-center justify-center h-screen w-full">
       <div className="p-8 rounded-md max-w-md flex flex-col gap-10 border border-gray-200">
         <div className="text-center">
-          <h1 className="font-extrabold text-2xl">Verify your email</h1>
+          <h1 className="font-extrabold text-2xl">Verify email</h1>
           <p className="text-sm text-gray-600">
             Enter the 6 digit code sent to your email
           </p>
