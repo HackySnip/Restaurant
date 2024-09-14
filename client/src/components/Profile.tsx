@@ -23,7 +23,7 @@ const Profile = () => {
         <div className="flex items-center gap-2">
           <Avatar className="relative md:size-28 size-20">
             <AvatarImage />
-            <AvatarFallback>RB</AvatarFallback>
+            <AvatarFallback>RBI</AvatarFallback>
             <input
               ref={imageRef}
               accept="image/*"
