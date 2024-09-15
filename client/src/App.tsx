@@ -7,6 +7,9 @@ import VerifyEmail from "./auth/VerifyEmail";
 import MainLayout from "./layout/MainLayout";
 import HeroSection from "./components/HeroSection";
 import Profile from "./components/Profile";
+import SearchPage from "./components/SearchPage";
+import RestaurantDetails from "./components/RestaurantDetails";
+import Cart from "./components/Cart";
 
 const appRouter = createBrowserRouter([
   {
@@ -20,6 +23,18 @@ const appRouter = createBrowserRouter([
       {
         path: "/profile",
         element: <Profile />,
+      },
+      {
+        path: "/search/:text",
+        element: <SearchPage />,
+      },
+      {
+        path: "/restaurant/:id",
+        element: <RestaurantDetails />,
+      },
+      {
+        path: "/cart",
+        element: <Cart />,
       },
     ],
   },
