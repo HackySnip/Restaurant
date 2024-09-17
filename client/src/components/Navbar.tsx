@@ -183,14 +183,14 @@ const MobileNav = () => {
             <span>Cart (0)</span>
           </Link>
           <Link
-            to="/menu"
+            to="/admin/menu"
             className="flex items-center gap-4 hover:bg-gray-200 px-3 py-2 rounded-lg cursor-pointer hover:text-gray-900 font-medium"
           >
             <SquareMenu />
             <span>Menu</span>
           </Link>
           <Link
-            to="/restaurant"
+            to="/admin/restaurant"
             className="flex items-center gap-4 hover:bg-gray-200 px-3 py-2 rounded-lg cursor-pointer hover:text-gray-900 font-medium"
           >
             <UtensilsCrossed />
