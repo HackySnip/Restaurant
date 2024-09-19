@@ -14,6 +14,7 @@ import { Loader2, Plus } from "lucide-react";
 import { ChangeEvent, FormEvent, useState } from "react";
 import HeroImage from "@/assets/hero_pizza.webp";
 import EditMenu from "./EditMenu";
+import { menuFormSchema, menuSchema } from "@/schema/menuSchema";
 
 const menus = [
   {
@@ -35,7 +36,7 @@ const menus = [
 const AddMenu = () => {
   const [open, setOpen] = useState<boolean>(false);
   const [editOpen, setEditOpen] = useState<boolean>(false);
-  const [input, setInput] = useState<any>({
+  const [input, setInput] = useState<menuFormSchema>({
     image: undefined,
     name: "",
     description: "",
@@ -43,6 +44,7 @@ const AddMenu = () => {
   });
   const loading = false;
   const [selectedMenu, setSelectedMenu] = useState<any>();
+  const [error, setError] = useState<Partial<menuFormSchema>>({});
 
   const changeEventHandler = (e: ChangeEvent<HTMLInputElement>) => {
     const { name, value, type } = e.target;
@@ -51,7 +53,12 @@ const AddMenu = () => {
 
   const submitHandler = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    console.log("Add Menu", input);
+    const result = menuSchema.safeParse(input);
+    if (!result.success) {
+      const fieldError = result.error.formErrors.fieldErrors;
+      setError(fieldError as Partial<menuFormSchema>);
+      return;
+    }
   };
   return (
     <div className="max-w-7xl mx-auto my-10">
@@ -83,16 +90,26 @@ const AddMenu = () => {
                   type="text"
                   placeholder="Enter menu name"
                 />
+                {error && (
+                  <span className="text-xs font-medium text-red-600">
+                    {error.name}
+                  </span>
+                )}
               </div>
               <div>
                 <Label>Description</Label>
                 <Input
                   name="description"
-                  value={input.descrition}
+                  value={input.description}
                   onChange={changeEventHandler}
                   type="text"
                   placeholder="Enter menu description"
                 />
+                {error && (
+                  <span className="text-xs font-medium text-red-600">
+                    {error.description}
+                  </span>
+                )}
               </div>
               <div>
                 <Label>Price</Label>
@@ -103,6 +120,11 @@ const AddMenu = () => {
                   type="number"
                   placeholder="Enter menu price"
                 />
+                {error && (
+                  <span className="text-xs font-medium text-red-600">
+                    {error.price}
+                  </span>
+                )}
               </div>
               <div>
                 <Label>Upload Menu Image</Label>
@@ -116,6 +138,11 @@ const AddMenu = () => {
                   }
                   type="file"
                 />
+                {error && (
+                  <span className="text-xs font-medium text-red-600">
+                    {error.image?.name || "Image is required"}
+                  </span>
+                )}
               </div>
               <DialogFooter className="mt-5">
                 {loading ? (
@@ -155,7 +182,7 @@ const AddMenu = () => {
             </div>
             <Button
               onClick={() => {
-                selectedMenu();
+                setSelectedMenu(menu);
                 setEditOpen(true);
               }}
               size={"sm"}
