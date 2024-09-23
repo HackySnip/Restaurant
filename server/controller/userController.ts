@@ -2,6 +2,15 @@ import { Request, Response } from "express";
 import { User } from "../models/user.model";
 import bcrypt from "bcryptjs";
 import crypto from "crypto";
+import cloudinary from "../utils/cloudinary";
+import { genrateVerficationCode } from "../utils/generateVerificationCode";
+import { generateToken } from "../utils/generateToken";
+import {
+  sendPasswordResetEmail,
+  sendResetSuccessEmail,
+  sendVerificationEmail,
+  sendWelcomeEmail,
+} from "../mailtrap/email";
 
 export const signup = async (req: Request, res: Response) => {
   try {
@@ -18,7 +27,7 @@ export const signup = async (req: Request, res: Response) => {
 
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    const verificationToken = "kjvbsdkjv"; //generateVerification();
+    const verificationToken = genrateVerficationCode();
 
     user = await User.create({
       fullname,
@@ -29,9 +38,9 @@ export const signup = async (req: Request, res: Response) => {
       verificationTokenExpiresAt: Date.now() + 24 * 60 * 60 * 1000,
     });
 
-    //  generateToken(req, user);
+    generateToken(res, user);
 
-    // await sendVerification(email, verificationToken);
+    await sendVerificationEmail(email, verificationToken);
 
     const userWithoutPassword = await User.findOne({
       email,
@@ -70,6 +79,8 @@ export const login = async (req: Request, res: Response) => {
         message: "Invalid credentials",
       });
     }
+
+    generateToken(res, user);
 
     user.lastLogin = new Date();
 
@@ -111,6 +122,8 @@ export const verifyEmail = async (req: Request, res: Response) => {
     user.verificationToken = undefined;
     user.verificationTokenExpiresAt = undefined;
     await user.save();
+
+    await sendWelcomeEmail(user.email, user.fullname);
 
     return res.status(200).json({
       success: true,
@@ -159,6 +172,11 @@ export const forgotPassword = async (req: Request, res: Response) => {
     user.resetPasswordTokenExpiresAt = resetTokenExpiresAt;
     await user.save();
 
+    await sendPasswordResetEmail(
+      user.email,
+      `${process.env.FRONTEND_URL}/resetpassword/${resetToken}`
+    );
+
     return res.status(200).json({
       success: true,
       message: "Password reset link sent to your email",
@@ -194,6 +212,8 @@ export const resetPassword = async (req: Request, res: Response) => {
     user.resetPasswordToken = undefined;
     user.resetPasswordTokenExpiresAt = undefined;
     await user.save();
+
+    await sendResetSuccessEmail(user.email);
 
     return res.status(200).json({
       success: true,
@@ -237,6 +257,28 @@ export const updateprofile = async (req: Request, res: Response) => {
     const userId = req.id;
     const { fullname, email, address, city, country, profilePicture } =
       req.body;
+
+    let cloudResponse: any;
+    cloudResponse = await cloudinary.uploader.upload(profilePicture);
+
+    const updatedData = {
+      fullname,
+      email,
+      address,
+      city,
+      country,
+      profilePicture,
+    };
+
+    const user = await User.findByIdAndUpdate(userId, updatedData, {
+      new: true,
+    }).select("-password");
+
+    return res.status(200).json({
+      success: false,
+      data: { user },
+      message: "Profile updated successfully",
+    });
   } catch (error) {
     console.error(error);
     return res.status(500).json({
