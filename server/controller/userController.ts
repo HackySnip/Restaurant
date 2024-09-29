@@ -49,7 +49,7 @@ export const signup = async (req: Request, res: Response) => {
     return res.status(201).json({
       success: true,
       message: "Account created successfully",
-      data: { user: userWithoutPassword },
+      user: userWithoutPassword,
     });
   } catch (error) {
     console.error(error);
@@ -93,7 +93,7 @@ export const login = async (req: Request, res: Response) => {
     return res.status(200).json({
       success: true,
       message: `Welcome back ${user.fullname}`,
-      data: { user: userWithoutPassword },
+      user: userWithoutPassword,
     });
   } catch (error) {
     console.error(error);
@@ -128,7 +128,7 @@ export const verifyEmail = async (req: Request, res: Response) => {
     return res.status(200).json({
       success: true,
       message: "User verified successfully",
-      data: { user },
+      user,
     });
   } catch (error) {
     console.error(error);
@@ -180,7 +180,7 @@ export const forgotPassword = async (req: Request, res: Response) => {
     return res.status(200).json({
       success: true,
       message: "Password reset link sent to your email",
-      data: { user },
+      user,
     });
   } catch (error) {
     console.error(error);
@@ -218,7 +218,7 @@ export const resetPassword = async (req: Request, res: Response) => {
     return res.status(200).json({
       success: true,
       message: "Password changed successfully",
-      data: { user },
+      user,
     });
   } catch (error) {
     console.error(error);
@@ -242,7 +242,7 @@ export const checkAuth = async (req: Request, res: Response) => {
 
     return res.status(200).json({
       success: false,
-      data: { user },
+      user,
     });
   } catch (error) {
     console.error(error);
@@ -276,7 +276,7 @@ export const updateprofile = async (req: Request, res: Response) => {
 
     return res.status(200).json({
       success: false,
-      data: { user },
+      user,
       message: "Profile updated successfully",
     });
   } catch (error) {

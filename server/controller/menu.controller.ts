@@ -30,7 +30,7 @@ export const addMenu = async (req: Request, res: Response) => {
     return res.status(201).json({
       success: true,
       message: "Menu added successfully",
-      data: { menu },
+      menu,
     });
   } catch (error) {
     console.log(error);
@@ -65,7 +65,7 @@ export const editMenu = async (req: Request, res: Response) => {
     return res.status(200).json({
       success: true,
       message: "Menu updated sucessfully",
-      data: { menu },
+      menu,
     });
   } catch (error) {
     console.log(error);

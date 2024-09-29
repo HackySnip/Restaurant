@@ -65,7 +65,7 @@ export const getRestaurant = async (req: Request, res: Response) => {
 
     return res.status(200).json({
       success: true,
-      data: { restaurant },
+      restaurant,
     });
   } catch (error) {
     console.error(error);
@@ -102,7 +102,7 @@ export const updateRestaurant = async (req: Request, res: Response) => {
     return res.status(200).json({
       success: true,
       message: "Restaurant updated successfully",
-      data: { restaurant },
+      restaurant,
     });
   } catch (error) {
     console.error(error);
@@ -128,7 +128,7 @@ export const getRestaurantOrders = async (req: Request, res: Response) => {
 
     return res.status(200).json({
       success: true,
-      data: { orders },
+      orders,
     });
   } catch (error) {
     console.error(error);
@@ -195,7 +195,7 @@ export const searchRestaurant = async (req: Request, res: Response) => {
 
     return res.status(200).json({
       success: true,
-      data: { restaurants },
+      restaurants,
     });
   } catch (error) {
     console.error(error);
@@ -223,7 +223,7 @@ export const getSingleRestaurant = async (req: Request, res: Response) => {
     }
     return res.status(200).json({
       success: true,
-      data: { restaurant },
+      restaurant,
     });
   } catch (error) {
     console.error(error);
