@@ -15,7 +15,7 @@ const Signup = () => {
     contact: "",
   });
   const [errors, setErrors] = useState<Partial<SignupInputState>>({});
-  const { signup } = useUserStore();
+  const { signup, loading } = useUserStore();
 
   const changeEventHandler = (e: ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -33,7 +33,6 @@ const Signup = () => {
     await signup(input);
   };
 
-  const loading = false;
   return (
     <div className="flex items-center justify-center min-h-screen">
       <form

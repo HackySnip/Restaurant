@@ -4,10 +4,11 @@ import { Separator } from "@/components/ui/separator";
 import { Link } from "react-router-dom";
 import { KeyRound, Loader2, Mail } from "lucide-react";
 import { ChangeEvent, FormEvent, useState } from "react";
-import { LoginInputState } from "@/schema/userSchema";
-import { userSignUpSchema } from "../schema/userSchema";
+import { LoginInputState, userLoginSchema } from "@/schema/userSchema";
+import { useUserStore } from "../../store/useUserStore";
 
 const Login = () => {
+  const { login, loading } = useUserStore();
   const [input, setInput] = useState<LoginInputState>({
     email: "",
     password: "",
@@ -19,17 +20,17 @@ const Login = () => {
     setInput({ ...input, [name]: value });
   };
 
-  const loginSubmitHandler = (e: FormEvent) => {
+  const loginSubmitHandler = async (e: FormEvent) => {
     e.preventDefault();
-    const result = userSignUpSchema.safeParse(input);
+    const result = userLoginSchema.safeParse(input);
     if (!result.success) {
       const fieldErrors = result.error.formErrors.fieldErrors;
       setErrors(fieldErrors as Partial<LoginInputState>);
       return;
     }
+    await login(input);
   };
 
-  const loading = false;
   return (
     <div className="flex items-center justify-center min-h-screen">
       <form
