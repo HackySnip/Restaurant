@@ -1,7 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { KeyRound, Loader2, Mail, Phone, User } from "lucide-react";
 import { ChangeEvent, FormEvent, useState } from "react";
 import { SignupInputState, userSignUpSchema } from "@/schema/userSchema";
@@ -16,6 +16,7 @@ const Signup = () => {
   });
   const [errors, setErrors] = useState<Partial<SignupInputState>>({});
   const { signup, loading } = useUserStore();
+  const navigate = useNavigate();
 
   const changeEventHandler = (e: ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -30,7 +31,12 @@ const Signup = () => {
       setErrors(fieldErrors as Partial<SignupInputState>);
     }
 
-    await signup(input);
+    try {
+      await signup(input);
+      navigate("/verify-email");
+    } catch (error) {
+      console.error(error);
+    }
   };
 
   return (

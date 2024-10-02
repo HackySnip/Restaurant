@@ -19,12 +19,11 @@ export const isAuthenticated = async (
     if (!token) {
       return res.status(401).json({
         success: false,
-        message: "User is noy authenticated",
+        message: "User is not authenticated",
       });
     }
 
     const decode = jwt.verify(token, process.env.SECRET_KEY!) as jwt.JwtPayload;
-
     if (!decode) {
       return res.status(401).json({
         success: false,

@@ -49,7 +49,7 @@ const Navbar = () => {
         </Link>
         <div className="hidden md:flex items-center gap-10">
           <div className="hidden md:flex items-center gap-6">
-            <Link to="/home">Home</Link>
+            <Link to="/">Home</Link>
             <Link to="/profile">Profile</Link>
             <Link to="/order/status">Order</Link>
             {admin && (

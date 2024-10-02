@@ -1,13 +1,40 @@
 import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
 import axios from "axios";
-import { LoginInputState, SignupInputState } from "@/schema/userSchema";
 import { toast } from "sonner";
+import { SignupInputState, LoginInputState } from "../src/schema/userSchema";
 
 const API_END_POINT = "http://localhost:8000/api/v1/user";
 axios.defaults.withCredentials = true;
 
-export const useUserStore = create<any>()(
+type User = {
+  fullname: string;
+  email: string;
+  contact: number;
+  city: string;
+  country: string;
+  address: string;
+  profilePicture: string;
+  admin: boolean;
+  isVerified: boolean;
+};
+
+type UserState = {
+  user: User | null;
+  isAuthenticated: boolean;
+  isCheckingAuth: boolean;
+  loading: boolean;
+  signup: (input: SignupInputState) => Promise<void>;
+  login: (input: LoginInputState) => Promise<void>;
+  verifyEmail: (verificationCode: string) => Promise<void>;
+  checkAuth: () => Promise<void>;
+  logout: () => Promise<void>;
+  forgotPassword: (email: string) => Promise<void>;
+  resetPassword: (token: string, newPassword: string) => Promise<void>;
+  updateProfile: (token: string, newPassword: string) => Promise<void>;
+};
+
+export const useUserStore = create<UserState>()(
   persist(
     (set) => ({
       user: null,
@@ -84,12 +111,9 @@ export const useUserStore = create<any>()(
       checkAuth: async () => {
         try {
           set({ isCheckingAuth: true });
-          const response = await axios.get(
-            `${API_END_POINT}/check-authentication`
-          );
+          const response = await axios.get(`${API_END_POINT}/check-auth`);
           if (response.data.success) {
             set({
-              loading: true,
               isAuthenticated: true,
               user: response.data.user,
               isCheckingAuth: false,
@@ -98,7 +122,6 @@ export const useUserStore = create<any>()(
         } catch (error: any) {
           toast.error(error.response.data.message);
           set({
-            loading: false,
             isAuthenticated: false,
             isCheckingAuth: false,
           });
@@ -116,7 +139,58 @@ export const useUserStore = create<any>()(
           set({ loading: false });
         }
       },
-      // 13:04:15
+      forgotPassword: async (email: string) => {
+        try {
+          set({ loading: true });
+          const response = await axios.post(
+            `${API_END_POINT}/forgot-password`,
+            { email }
+          );
+          if (response.data.success) {
+            toast.success(response.data.message);
+            set({ loading: false });
+          }
+        } catch (error: any) {
+          toast.error(error.response.data.message);
+          set({ loading: false });
+        }
+      },
+      resetPassword: async (token: string, newPassword: string) => {
+        try {
+          set({ loading: true });
+          const response = await axios.post(
+            `${API_END_POINT}/reset-password/${token}`,
+            { newPassword }
+          );
+          if (response.data.success) {
+            toast.success(response.data.message);
+            set({ loading: false });
+          }
+        } catch (error: any) {
+          toast.error(error.response.data.message);
+          set({ loading: false });
+        }
+      },
+      updateProfile: async (input: any) => {
+        try {
+          set({ loading: true });
+          const response = await axios.put(
+            `${API_END_POINT}/profile/update`,
+            input
+          );
+          if (response.data.success) {
+            toast.success(response.data.message);
+            set({
+              loading: false,
+              user: response.data.user,
+              isAuthenticated: true,
+            });
+          }
+        } catch (error: any) {
+          toast.error(error.response.data.message);
+          set({ loading: false });
+        }
+      },
     }),
     {
       name: "user-name",
