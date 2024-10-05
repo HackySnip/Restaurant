@@ -12,38 +12,38 @@ import { Label } from "@/components/ui/label";
 import { menuFormSchema, menuSchema } from "@/schema/menuSchema";
 import { Loader2 } from "lucide-react";
 import {
-  ChangeEvent,
   Dispatch,
   FormEvent,
   SetStateAction,
   useEffect,
   useState,
 } from "react";
+import { useMenuStore } from "../../store/useMenuStore";
 
 const EditMenu = ({
   selectedMenu,
   editOpen,
   setEditOpen,
 }: {
-  selectedMenu: menuFormSchema;
+  selectedMenu: any;
   editOpen: boolean;
   setEditOpen: Dispatch<SetStateAction<boolean>>;
 }) => {
-  const [error, setError] = useState<Partial<menuFormSchema>>({});
   const [input, setInput] = useState<menuFormSchema>({
-    image: undefined,
     name: "",
     description: "",
     price: 0,
+    image: undefined,
   });
-  const loading = false;
+  const [error, setError] = useState<Partial<menuFormSchema>>({});
+  const { loading, editMenu } = useMenuStore();
 
-  const changeEventHandler = (e: ChangeEvent<HTMLInputElement>) => {
+  const changeEventHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value, type } = e.target;
     setInput({ ...input, [name]: type === "number" ? Number(value) : value });
   };
 
-  const submitHandler = (e: FormEvent<HTMLFormElement>) => {
+  const submitHandler = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const result = menuSchema.safeParse(input);
     if (!result.success) {
@@ -51,17 +51,29 @@ const EditMenu = ({
       setError(fieldErrors as Partial<menuFormSchema>);
       return;
     }
+
+    try {
+      const formData = new FormData();
+      formData.append("name", input.name);
+      formData.append("description", input.description);
+      formData.append("price", input.price.toString());
+      if (input.image) {
+        formData.append("image", input.image);
+      }
+      await editMenu(selectedMenu._id, formData);
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   useEffect(() => {
     setInput({
-      image: selectedMenu?.image || undefined,
       name: selectedMenu?.name || "",
       description: selectedMenu?.description || "",
       price: selectedMenu?.price || 0,
+      image: undefined,
     });
   }, [selectedMenu]);
-
   return (
     <Dialog open={editOpen} onOpenChange={setEditOpen}>
       <DialogContent>
@@ -131,7 +143,7 @@ const EditMenu = ({
             />
             {error && (
               <span className="text-xs font-medium text-red-600">
-                {error.image?.name || "Image is required"}
+                {error.image?.name}
               </span>
             )}
           </div>

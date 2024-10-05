@@ -88,6 +88,28 @@ export const useRestaurantStore = create<any>()(
           console.error(error);
         }
       },
+      addMenuToRestaurant: (menu: any) => {
+        set((state: any) => ({
+          restaurant: state.restaurant
+            ? { ...state.restaurant, menus: [...state.restaurant.menus, menu] }
+            : null,
+        }));
+      },
+      updateMenuToRestaurant: (updatedMenu: any) => {
+        set((state: any) => {
+          if (state.restaurant) {
+            const updatedMenuList = state.restaurant.menus.map((menu: any) =>
+              menu?._id === updatedMenu?._id ? updatedMenu : null
+            );
+            return {
+              restaurant: {
+                ...state.restaurant,
+                menus: updatedMenuList,
+              },
+            };
+          }
+        });
+      },
     }),
     {
       name: "restaurant-name",
