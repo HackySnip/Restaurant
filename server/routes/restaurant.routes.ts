@@ -15,15 +15,15 @@ const router = express.Router();
 
 router
   .route("/")
-  .post(isAuthenticated, upload.single("imageFile"), createRestaurant);
+  .post(isAuthenticated, upload.single("image"), createRestaurant);
 
 router.route("/").get(isAuthenticated, getRestaurant);
 router
   .route("/")
-  .put(isAuthenticated, upload.single("imageFile"), updateRestaurant);
+  .put(isAuthenticated, upload.single("image"), updateRestaurant);
 router
   .route("/order/:orderId/status")
-  .put(isAuthenticated, upload.single("imageFile"), updateOrderStatus);
+  .put(isAuthenticated, upload.single("image"), updateOrderStatus);
 router.route("/order").get(isAuthenticated, getRestaurantOrders);
 router.route("/search/:searchText").get(isAuthenticated, searchRestaurant);
 router.route("/:id").get(isAuthenticated, getSingleRestaurant);

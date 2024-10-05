@@ -7,29 +7,24 @@ import { Order } from "../models/order.model";
 
 export const createRestaurant = async (req: Request, res: Response) => {
   try {
-    const { restaurantName, city, country, price, deliveryTime, cuisines } =
-      req.body;
-
+    const { restaurantName, city, country, deliveryTime, cuisines } = req.body;
     const file = req.file;
 
     const restaurant = await Restaurant.findOne({ user: req.id });
-
     if (restaurant) {
       return res.status(400).json({
         success: false,
-        message: "Restaurant already exists for this user",
+        message: "Restaurant already exist for this user",
       });
     }
-
     if (!file) {
       return res.status(400).json({
         success: false,
-        message: "Restaurant image is required",
+        message: "Image is required",
       });
     }
-
     const imageUrl = await uploadImageOnCloudinary(file as Express.Multer.File);
-
+    console.log("first", imageUrl);
     await Restaurant.create({
       user: req.id,
       restaurantName,
@@ -39,26 +34,26 @@ export const createRestaurant = async (req: Request, res: Response) => {
       cuisines: JSON.parse(cuisines),
       imageUrl,
     });
-
-    return res.status(200).json({
+    return res.status(201).json({
       success: true,
-      message: "Restaurant created successfully",
+      message: "Restaurant Added",
     });
   } catch (error) {
-    console.error(error);
-    return res.status(500).json({
-      message: "Internal server error",
-    });
+    console.log(error);
+    return res.status(500).json({ message: "Internal server error" });
   }
 };
 
 export const getRestaurant = async (req: Request, res: Response) => {
   try {
-    const restaurant = await Restaurant.findOne({ user: req.id });
+    const restaurant = await Restaurant.findOne({ user: req.id }).populate(
+      "menus"
+    );
 
     if (!restaurant) {
       return res.status(400).json({
         success: false,
+        restaurant: [],
         message: "Restaurant not found",
       });
     }

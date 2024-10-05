@@ -6,10 +6,11 @@ import {
   restaurantStateTypes,
 } from "@/schema/restaurantSchema";
 import { Loader2 } from "lucide-react";
-import { ChangeEvent, FormEvent, useState } from "react";
+import { ChangeEvent, FormEvent, useEffect, useState } from "react";
+import { useRestaurantStore } from '../../store/useRestaurantStore';
+import { getRestaurant } from '../../../server/controller/restaurant.controller';
 
 const Restaurant = () => {
-  const loading = false;
   const [errors, setErrors] = useState<Partial<restaurantStateTypes>>({});
   const [input, setInput] = useState<restaurantStateTypes>({
     restaurantName: "",
@@ -19,13 +20,14 @@ const Restaurant = () => {
     cuisines: [],
     imageFile: undefined,
   });
+  const { loading, createRestaurant, updateRestaurant, restaurant, getRestaurant } = useRestaurantStore();
 
   const changeEventHandler = (e: ChangeEvent<HTMLInputElement>) => {
     const { name, value, type } = e.target;
     setInput({ ...input, [name]: type === "number" ? Number(value) : value });
   };
 
-  const submitHandler = (e: FormEvent<HTMLFormElement>) => {
+  const submitHandler = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
     const result = restaurantSchema.safeParse(input);
@@ -34,10 +36,43 @@ const Restaurant = () => {
       setErrors(fieldErrors as Partial<restaurantStateTypes>);
       return;
     }
-    console.log("Restaurant", input);
+    try {
+      const formData = new FormData();
+      formData.append("restaurantName", input.restaurantName);
+      formData.append("city", input.city);
+      formData.append("country", input.country);
+      formData.append("deliveryTime", input.deliveryTime.toString());
+      formData.append("cuisines", JSON.stringify(input.cuisines));
+      if (input.imageFile) {
+        formData.append("image", input.imageFile);
+      }
+
+      if (restaurant) {
+        await updateRestaurant(formData);
+      } else {
+        await createRestaurant(formData);
+      }
+    } catch (error) {
+      console.error(error);
+    }
   };
 
-  const restaurantHai = false;
+  useEffect(() => {
+    const fetchRestaurant = async () => {
+      await getRestaurant();
+      console.log(restaurant)
+      setInput({
+        restaurantName: restaurant?.restaurantName || "",
+        city: restaurant?.city || "",
+        country: restaurant?.country || "",
+        deliveryTime: restaurant?.deliveryTime || 0,
+        cuisines: restaurant?.cuisines.map((cuisine: string) => cuisine) || [],
+        imageFile: undefined,
+      })
+    }
+    fetchRestaurant()
+  }, [])
+
   return (
     <div className="max-w-7xl mx-auto my-10">
       <div>
@@ -130,7 +165,7 @@ const Restaurant = () => {
                 />
                 {errors && (
                   <span className="text-red-500 text-sm">
-                    {errors.imageFile?.name || "Image is required"}
+                    {errors.imageFile?.name}
                   </span>
                 )}
               </div>
@@ -146,7 +181,7 @@ const Restaurant = () => {
                 </Button>
               ) : (
                 <Button className="bg-orange hover:bg-hoverOrange">
-                  {restaurantHai
+                  {!restaurant
                     ? "Add Your Restaurant"
                     : "Update Your Restaurant"}
                 </Button>
